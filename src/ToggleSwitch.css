@@ -1,0 +1,35 @@
+/* src/ToggleSwitch.css */
+
+.toggle-switch {
+    width: 100px;
+    height: 50px;
+    border-radius: 25px;
+    background-size: cover;
+    position: relative;
+    cursor: pointer;
+    transition: background-image 0.5s ease;
+  }
+  
+  .toggle-switch.day {
+    background-image: url('/public/Japan---mt.-fuji-night-.png')
+  }
+  
+  .toggle-switch.night {
+    background-image: url('/public/scenary.png')
+  }
+  
+  .toggle-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    transition: left 0.5s ease;
+  }
+  
+  .toggle-switch.night .toggle-thumb {
+    left: 55px;
+  }
+  
