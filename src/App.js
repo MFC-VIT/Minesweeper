@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Board from "./components/Board";
 import ToggleSwitch from "./ToggleSwitch";
-import BoardSelect from "./components/BoardSelect";
+
 
 function App() {
   const [boardsize, setBoardSize] = useState(16);
@@ -40,7 +40,7 @@ function App() {
             <option value={12}>Medium (12x12)</option>
             <option value={15}>Large (15x15)</option>
           </select>
-          <label htmlFor="size">Select Difficulty: </label>
+          <label htmlFor="size" className={`text-${color}`}>Select Difficulty: </label>
           <select id="size" value={difficulty} onChange={handledifficulty}>
             <option value={'easy'}>Easy</option>
             <option value={'medium'}>Medium</option>

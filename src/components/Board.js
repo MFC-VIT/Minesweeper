@@ -267,7 +267,7 @@ function Board({ size, mode, difficulty, mines }) {
   };
 
   if (!cells.length) {
-    return null; // or loading indicator
+    return null; 
   }
 
   const numberColors = {
