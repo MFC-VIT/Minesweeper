@@ -16,9 +16,9 @@ function Board({ size, mode, difficulty, mines }) {
         let rows = parsedSize;
         let cols = parsedSize;
 
-        if (parsedSize === 24) {
-          rows = 24;
-          cols = 16;
+        if (parsedSize === 14) {
+          rows = 14;
+          cols = 12;
         }
 
         initializeBoard(rows, cols);
@@ -79,13 +79,13 @@ function Board({ size, mode, difficulty, mines }) {
     if (mines) return mines;
     switch (difficulty) {
       case 'easy':
-        return 10;
+        return Math.round(rows*cols*0.2);
       case 'medium':
-        return 40;
+        return Math.round(rows*cols*0.3);
       case 'hard':
-        return 99;
+        return Math.round(rows*cols*0.4);
       default:
-        return 40;
+        return Math.round(rows*cols*0.3);
     }
   };
 
@@ -216,7 +216,7 @@ function Board({ size, mode, difficulty, mines }) {
 
       initializeBoard(rows, cols);
     }
-    const minesCount = createMines(parsedSize);
+    const minesCount = parseInt(createMines(parsedSize,parsedSize));
     setFlagsLeft(minesCount);
     setTimer(0);
     clearInterval(intervalId);
@@ -269,9 +269,21 @@ function Board({ size, mode, difficulty, mines }) {
   if (!cells.length) {
     return null; // or loading indicator
   }
+
+  const numberColors = {
+    1: 'text-blue-600',
+    2: 'text-green-600',
+    3: 'text-red-600',
+    4: 'text-purple-600',
+    5: 'text-maroon-600',
+    6: 'text-turquoise-600',
+    7: 'text-black',
+    8: 'text-gray-600',
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className={`flex items        -center justify-center space-x-4 mb-2 text-${mode}`}>
+    <div className="flex flex-col items-center justify-center p-2 sm:p-4">
+      <div className={`flex items-center justify-center space-x-4 mb-2 text-${mode}`}>
         <div className="flex gap-2">
           <img src="/red-flag.png" alt="Flags left" />
           <div>: {flagsLeft}</div>
@@ -281,40 +293,48 @@ function Board({ size, mode, difficulty, mines }) {
           <div>Timer: {timer}s</div>
         </div>
       </div>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center ">
         {cells.map((row, rowIndex) => (
           <div key={rowIndex} className="flex">
-            {row.map((cell, colIndex) => (
-              <div
-                key={`${rowIndex}-${colIndex}`}
-                className={`w-[1.85rem] bg-slate-400 text-center shadow ${cell.isOpen ? 'bg-slate-100 border-[1.5px] border-[#696969]' : 'bg-slate-400 border-[1.5px] border-[#d3d3d3]'}`}
-                onClick={() => handleCellClick(rowIndex, colIndex)}
-                onContextMenu={(e) => handleRightClick(e, rowIndex, colIndex)}
-              >
-                {cell.isOpen ? (
-                  cell.isMine ? (
-                    <div className="flex items-center justify-center w-full h-full bg-[#ff0000] border-[1.5px] border-[#8b000]">
-                      <img className="" src="/mine.png" alt="Mine" />
-                    </div>
+            {row.map((cell, colIndex) => {
+              const isAlternatingColor = (rowIndex + colIndex) % 2 === 0;
+              const bgColor = cell.isOpen ? 'bg-slate-100' : isAlternatingColor ? 'bg-slate-400' : 'bg-slate-300';
+              const borderColor = cell.isOpen ? 'border-[#696969]' : 'border-[#d3d3d3]';
+
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  className={`w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-center shadow ${bgColor} ${borderColor} border-[1.5px]`}
+                  onClick={() => handleCellClick(rowIndex, colIndex)}
+                  onContextMenu={(e) => handleRightClick(e, rowIndex, colIndex)}
+                >
+                  {cell.isOpen ? (
+                    cell.isMine ? (
+                      <div className="flex items-center justify-center w-full h-full bg-[#ff0000] border-[1.5px] border-[#8b000]">
+                        <img className="w-4 h-4 md:w-6 md:h-6" src="/mine.png" alt="Mine" />
+                      </div>
+                    ) : (
+                      <div className={`flex items-center justify-center w-full h-full ${numberColors[cell.num]}`}>
+                        {cell.num > 0 ? cell.num : ''}
+                      </div>
+                    )
                   ) : (
-                    <div className="w-[1.5rem] h-[1.5rem] flex items-center justify-center ">{cell.num > 0 ? cell.num : ''}</div>
-                  )
-                ) : (
-                  cell.isFlagged ? (
-                    <img className="w-[1.5rem] border-[1.5px] h-[1.5rem] bg-[#ffd700]" src="/red-flag.png" alt="Flag" />
-                  ) : (
-                    <div className="text-gray-400 w-[1.5rem] h-[1.5rem]">{" "}</div>
-                  )
-                )}
-              </div>
-            ))}
+                    cell.isFlagged ? (
+                      <img className="w-full h-full border-[1.5px] bg-[#ffd700]" src="/red-flag.png" alt="Flag" />
+                    ) : (
+                      <div className="text-gray-400 w-full h-full">{" "}</div>
+                    )
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
-      <div className="flex items-center justify-center space-x-4 mt-2">
-        <button onClick={resetBoard} className="bg-blue-500 text-white py-2 px-4 rounded">Reset</button>
+      <div className="flex flex-wrap items-center justify-center space-x-2 mt-[3rem]">
+        <button onClick={resetBoard} className="bg-blue-500 text-white py-2 px-4 rounded mb-2 md:mb-0">Reset</button>
         {!gameStarted && !gameOver && (
-          <button onClick={() => { setGameStarted(true); startTimer(); }} className="bg-green-500 text-white py-2 px-4 rounded">Start</button>
+          <button onClick={() => { setGameStarted(true); startTimer(); }} className="bg-green-500 text-white py-2 px-4 rounded mb-2 md:mb-0">Start</button>
         )}
       </div>
       {gameOver && (
@@ -322,10 +342,10 @@ function Board({ size, mode, difficulty, mines }) {
           Game Over
         </div>
       )}
-      <div className="flex space-x-4 mt-4">
+      <div className="flex flex-wrap justify-center space-x-2 mt-4">
         <button
           onClick={() => handlePowerUp('revealSurroundingCells')}
-          className={`bg-orange-500 text-white py-2 px-4 rounded ${gameOver ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-orange-500 text-white py-2 px-4 rounded mb-2 md:mb-0 ${gameOver ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={gameOver}
         >
           Reveal Surrounding Cells ({powerups.revealSurroundingCells})
@@ -341,4 +361,6 @@ function Board({ size, mode, difficulty, mines }) {
     </div>
   );
 }
+
 export default Board;
+
